@@ -68,6 +68,7 @@
 		8503D8311DE42324002B8A7F /* yay.wav in Resources */ = {isa = PBXBuildFile; fileRef = 8503D7F41DE42324002B8A7F /* yay.wav */; };
 		8503D8321DE42324002B8A7F /* yeah.wav in Resources */ = {isa = PBXBuildFile; fileRef = 8503D7F51DE42324002B8A7F /* yeah.wav */; };
 		8503D8331DE42324002B8A7F /* yes.wav in Resources */ = {isa = PBXBuildFile; fileRef = 8503D7F61DE42324002B8A7F /* yes.wav */; };
+		8503D8351DE43B1A002B8A7F /* FinishCup.sks in Resources */ = {isa = PBXBuildFile; fileRef = 8503D8341DE43B19002B8A7F /* FinishCup.sks */; };
 		859F0F1B1DDFC29800882857 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 859F0F1A1DDFC29800882857 /* AppDelegate.swift */; };
 		859F0F1D1DDFC29800882857 /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 859F0F1C1DDFC29800882857 /* GameScene.sks */; };
 		859F0F1F1DDFC29800882857 /* Actions.sks in Resources */ = {isa = PBXBuildFile; fileRef = 859F0F1E1DDFC29800882857 /* Actions.sks */; };
@@ -141,11 +142,12 @@
 		8503D7F41DE42324002B8A7F /* yay.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = yay.wav; sourceTree = "<group>"; };
 		8503D7F51DE42324002B8A7F /* yeah.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = yeah.wav; sourceTree = "<group>"; };
 		8503D7F61DE42324002B8A7F /* yes.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = yes.wav; sourceTree = "<group>"; };
+		8503D8341DE43B19002B8A7F /* FinishCup.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = FinishCup.sks; sourceTree = "<group>"; };
 		859F0F171DDFC29800882857 /* Freeballin.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Freeballin.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		859F0F1A1DDFC29800882857 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		859F0F1C1DDFC29800882857 /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
 		859F0F1E1DDFC29800882857 /* Actions.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Actions.sks; sourceTree = "<group>"; };
-		859F0F201DDFC29800882857 /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
+		859F0F201DDFC29800882857 /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = GameScene.swift; sourceTree = "<group>"; };
 		859F0F221DDFC29800882857 /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
 		859F0F251DDFC29800882857 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		859F0F271DDFC29800882857 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -255,6 +257,7 @@
 				859F0F1A1DDFC29800882857 /* AppDelegate.swift */,
 				859F0F1C1DDFC29800882857 /* GameScene.sks */,
 				859F0F461DDFF16E00882857 /* Ball.sks */,
+				8503D8341DE43B19002B8A7F /* FinishCup.sks */,
 				859F0F1E1DDFC29800882857 /* Actions.sks */,
 				859F0F201DDFC29800882857 /* GameScene.swift */,
 				859F0F221DDFC29800882857 /* GameViewController.swift */,
@@ -384,6 +387,7 @@
 				8503D80C1DE42324002B8A7F /* meow.wav in Resources */,
 				859F0F2B1DDFC29800882857 /* LaunchScreen.storyboard in Resources */,
 				859F0F1F1DDFC29800882857 /* Actions.sks in Resources */,
+				8503D8351DE43B1A002B8A7F /* FinishCup.sks in Resources */,
 				8503D8111DE42324002B8A7F /* ohh.wav in Resources */,
 				8503D8261DE42324002B8A7F /* superr2.wav in Resources */,
 				8503D80B1DE42324002B8A7F /* lameyippee.wav in Resources */,

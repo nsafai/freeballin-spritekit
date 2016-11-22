@@ -9,13 +9,14 @@
 import SpriteKit
 import GameplayKit
 
-class GameScene: SKScene {
+class GameScene: SKScene, SKPhysicsContactDelegate {
     
     /* boiler plate variables */
     var entities = [GKEntity]()
     var graphs = [String : GKGraph]()
 
     var ball: SKSpriteNode!
+    var finishCup: SKSpriteNode!
     var playIcon: SKSpriteNode!
     var stopIcon: SKSpriteNode!
     
@@ -32,15 +33,18 @@ class GameScene: SKScene {
             setupMode = true
         }
     override func didMove(to view: SKView) {
-        /* Set up your scene here */
+        /* Set physics contact delegate */
+        physicsWorld.contactDelegate = self
         
         ball = self.childNode(withName: "//ball") as! SKSpriteNode
+        finishCup = self.childNode(withName: "//FinishCup") as! SKSpriteNode
         playIcon = self.childNode(withName: "//PlayIcon") as! SKSpriteNode
         stopIcon = self.childNode(withName: "//StopIcon") as! SKSpriteNode
         
         ball.physicsBody?.isDynamic = false
         ballStartingPosition = ball.position
-        
+        ball.physicsBody!.contactTestBitMask = ball.physicsBody!.collisionBitMask
+        finishCup.physicsBody!.contactTestBitMask = finishCup.physicsBody!.collisionBitMask
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -82,6 +86,16 @@ class GameScene: SKScene {
         /* play SFX*/
         reset()
     }
+    
+    func didBegin(_ contact: SKPhysicsContact) {
+        print("contact between two objects")
+        if ((contact.bodyA.node?.name == "ball") && (contact.bodyB.node?.name == "finishCup")) {
+                /* victory */
+                gameOver()
+        }
+        
+    }
+    
     
     override func update(_ currentTime: TimeInterval) {
         /* Called before each frame is rendered */
