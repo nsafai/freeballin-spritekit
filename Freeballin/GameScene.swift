@@ -14,6 +14,8 @@ class GameScene: SKScene {
     var entities = [GKEntity]()
     var graphs = [String : GKGraph]()
     var ball: SKSpriteNode!
+    var setupMode: Bool = true
+    var ballStartingPosition = CGPoint()
     
     private var lastUpdateTime : TimeInterval = 0
     private var label : SKLabelNode?
@@ -28,30 +30,43 @@ class GameScene: SKScene {
 //        if let label = self.label {
 //            label.alpha = 0.0
 //            label.run(SKAction.fadeIn(withDuration: 2.0))
-        
+        setupMode = true
         }
     override func didMove(to view: SKView) {
         /* Set up your scene here */
         /* Recursive node search for 'ball' (child of referenced node) */
         ball = self.childNode(withName: "//ball") as! SKSpriteNode
-        ball.physicsBody?.isDynamic = false
         
+        ball.physicsBody?.isDynamic = false
+        ballStartingPosition = ball.position
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        /* Called when a touch begins */
+ 
         
-        /* Apply vertical impulse */
-//        ball.physicsBody?.affectedByGravity = false
+        if setupMode == true /*game on*/ {
+            play()
+        } else /* restart*/ {
+            reset()
+        }
+    }
+    func play() {
         
-        /* drop the ball*/
-        ball.physicsBody?.isDynamic = true
-        /* Play SFX */
+        ball.physicsBody?.isDynamic = true /* drop the ball*/
+
         let wooshSound = SKAction.playSoundFileNamed("woosh.wav", waitForCompletion: false)
         self.run(wooshSound)
-        print("hello")
-//        ball.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 1000))
+        setupMode = false
     }
+    
+    func reset() {
+        
+        setupMode = true
+        ball.position = ballStartingPosition
+        ball.physicsBody?.isDynamic = false
+        
+    }
+
     
     override func update(_ currentTime: TimeInterval) {
         /* Called before each frame is rendered */
