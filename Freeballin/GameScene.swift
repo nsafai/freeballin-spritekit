@@ -11,9 +11,14 @@ import GameplayKit
 
 class GameScene: SKScene {
     
+    /* boiler plate variables */
     var entities = [GKEntity]()
     var graphs = [String : GKGraph]()
+
     var ball: SKSpriteNode!
+    var playIcon: SKSpriteNode!
+    var stopIcon: SKSpriteNode!
+    
     var setupMode: Bool = true
     var ballStartingPosition = CGPoint()
     
@@ -24,26 +29,22 @@ class GameScene: SKScene {
     override func sceneDidLoad() {
 
         self.lastUpdateTime = 0
-        
-//        // Get label node from scene and store it for use later
-//        self.label = self.childNode(withName: "//helloLabel") as? SKLabelNode
-//        if let label = self.label {
-//            label.alpha = 0.0
-//            label.run(SKAction.fadeIn(withDuration: 2.0))
-        setupMode = true
+            setupMode = true
         }
     override func didMove(to view: SKView) {
         /* Set up your scene here */
-        /* Recursive node search for 'ball' (child of referenced node) */
+        
         ball = self.childNode(withName: "//ball") as! SKSpriteNode
+        playIcon = self.childNode(withName: "//PlayIcon") as! SKSpriteNode
+        stopIcon = self.childNode(withName: "//StopIcon") as! SKSpriteNode
         
         ball.physicsBody?.isDynamic = false
         ballStartingPosition = ball.position
+        
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
  
-        
         if setupMode == true /*game on*/ {
             play()
         } else /* restart*/ {
@@ -57,16 +58,25 @@ class GameScene: SKScene {
         let wooshSound = SKAction.playSoundFileNamed("woosh.wav", waitForCompletion: false)
         self.run(wooshSound)
         setupMode = false
+        determineLogo()
     }
     
     func reset() {
-        
         setupMode = true
         ball.position = ballStartingPosition
         ball.physicsBody?.isDynamic = false
-        
+        determineLogo()
     }
-
+    
+    func determineLogo() {
+        if (setupMode == true) {
+            playIcon.alpha = 1
+            stopIcon.alpha = 0
+        } else {
+            playIcon.alpha = 0
+            stopIcon.alpha = 1
+        }
+    }
     
     override func update(_ currentTime: TimeInterval) {
         /* Called before each frame is rendered */
