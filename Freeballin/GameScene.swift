@@ -78,7 +78,17 @@ class GameScene: SKScene {
         }
     }
     
+    func gameOver() {
+        /* play SFX*/
+        reset()
+    }
+    
     override func update(_ currentTime: TimeInterval) {
         /* Called before each frame is rendered */
+        
+        if (!intersects(ball)) {
+            print("ball left the scene")
+            gameOver()
+        }
     }
 }
