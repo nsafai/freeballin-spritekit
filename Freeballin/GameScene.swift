@@ -68,16 +68,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        let touch:UITouch = touches.first!
+        let touch = touches.first!
         let positionInScene = touch.location(in: self)
-        let touchedNode = self.atPoint(positionInScene)
+        let previousPosition = touch.location(in: self)
+        let translation = CGVector(dx: positionInScene.x - previousPosition.x, dy: positionInScene.y - previousPosition.y)
+        let touchedNode = atPoint(positionInScene)
         
-        if touchedNode == lineBlock {
-            print("touched lineblock")
-            lineBlock.run(SKAction.move(to: positionInScene, duration: 0.0))
+        if true {
+            print("trying to move lineblock")
+            lineBlock.run(SKAction.move(by: translation, duration: 0.0))
         }
     }
-    
+    //            lineBlock.run(SKAction.move(to: CGPoint(x: lineBlock.position.x + translation.x, y: lineBlock.position.y + translation.y), duration: 0.0))
     func play() {
         
         ball.physicsBody?.isDynamic = true /* drop the ball*/
@@ -122,6 +124,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func didBegin(_ contact: SKPhysicsContact) {
         /* collision detections*/
         print("contact between two objects")
+        
+
         switch contact.bodyA.node!.name! {
         case "RedCupPhysicsBody":
             let cupSound = SKAction.playSoundFileNamed("redcup.wav", waitForCompletion: false)
@@ -129,7 +133,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         case "InsideCup":
             let cupSound = SKAction.playSoundFileNamed("redcup.wav", waitForCompletion: false)
             self.run(cupSound)
+            let aahSound = SKAction.playSoundFileNamed("aah.wav", waitForCompletion: false)
+            self.run(aahSound)
             finishCupCollision()
+        case "LineBlock":
+            let blockSound = SKAction.playSoundFileNamed("woodclick.wav", waitForCompletion: false)
+            self.run(blockSound)
         default:
             break
         }
