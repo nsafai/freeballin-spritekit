@@ -69,6 +69,7 @@
 		8503D8321DE42324002B8A7F /* yeah.wav in Resources */ = {isa = PBXBuildFile; fileRef = 8503D7F51DE42324002B8A7F /* yeah.wav */; };
 		8503D8331DE42324002B8A7F /* yes.wav in Resources */ = {isa = PBXBuildFile; fileRef = 8503D7F61DE42324002B8A7F /* yes.wav */; };
 		8503D8351DE43B1A002B8A7F /* FinishCup.sks in Resources */ = {isa = PBXBuildFile; fileRef = 8503D8341DE43B19002B8A7F /* FinishCup.sks */; };
+		8503D8411DE57568002B8A7F /* LineBlock.sks in Resources */ = {isa = PBXBuildFile; fileRef = 8503D8401DE57568002B8A7F /* LineBlock.sks */; };
 		859F0F1B1DDFC29800882857 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 859F0F1A1DDFC29800882857 /* AppDelegate.swift */; };
 		859F0F1D1DDFC29800882857 /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 859F0F1C1DDFC29800882857 /* GameScene.sks */; };
 		859F0F1F1DDFC29800882857 /* Actions.sks in Resources */ = {isa = PBXBuildFile; fileRef = 859F0F1E1DDFC29800882857 /* Actions.sks */; };
@@ -143,6 +144,7 @@
 		8503D7F51DE42324002B8A7F /* yeah.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = yeah.wav; sourceTree = "<group>"; };
 		8503D7F61DE42324002B8A7F /* yes.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = yes.wav; sourceTree = "<group>"; };
 		8503D8341DE43B19002B8A7F /* FinishCup.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = FinishCup.sks; sourceTree = "<group>"; };
+		8503D8401DE57568002B8A7F /* LineBlock.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = LineBlock.sks; sourceTree = "<group>"; };
 		859F0F171DDFC29800882857 /* Freeballin.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Freeballin.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		859F0F1A1DDFC29800882857 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		859F0F1C1DDFC29800882857 /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
@@ -260,6 +262,7 @@
 				8503D8341DE43B19002B8A7F /* FinishCup.sks */,
 				859F0F1E1DDFC29800882857 /* Actions.sks */,
 				859F0F201DDFC29800882857 /* GameScene.swift */,
+				8503D8401DE57568002B8A7F /* LineBlock.sks */,
 				859F0F221DDFC29800882857 /* GameViewController.swift */,
 				859F0F241DDFC29800882857 /* Main.storyboard */,
 				859F0F271DDFC29800882857 /* Assets.xcassets */,
@@ -376,6 +379,7 @@
 				8503D8101DE42324002B8A7F /* noice.wav in Resources */,
 				8503D8201DE42324002B8A7F /* shredderdan.wav in Resources */,
 				8503D82B1DE42324002B8A7F /* woodblock.wav in Resources */,
+				8503D8411DE57568002B8A7F /* LineBlock.sks in Resources */,
 				8503D82C1DE42324002B8A7F /* woodclick.wav in Resources */,
 				8503D8161DE42324002B8A7F /* oohlong.wav in Resources */,
 				8503D80E1DE42324002B8A7F /* meow3.wav in Resources */,

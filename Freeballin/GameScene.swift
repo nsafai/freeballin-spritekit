@@ -19,7 +19,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var finishCup: SKSpriteNode!
     var insideCup: SKSpriteNode!
     var playIcon: SKSpriteNode!
+    var playButton: SKSpriteNode!
     var stopIcon: SKSpriteNode!
+    var lineBlock: SKSpriteNode!
     
     var setupMode: Bool = true
     var ballStartingPosition = CGPoint()
@@ -34,14 +36,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             setupMode = true
         }
     override func didMove(to view: SKView) {
-        /* Set physics contact delegate */
+        /* Setup the scene */
         physicsWorld.contactDelegate = self
         
         ball = self.childNode(withName: "//ball") as! SKSpriteNode
         finishCup = self.childNode(withName: "//RedCupPhysicsBody") as! SKSpriteNode
         insideCup = self.childNode(withName: "//InsideCup") as! SKSpriteNode
         playIcon = self.childNode(withName: "//PlayIcon") as! SKSpriteNode
+        playButton = self.childNode(withName: "//PlayButton") as! SKSpriteNode
         stopIcon = self.childNode(withName: "//StopIcon") as! SKSpriteNode
+        lineBlock = self.childNode(withName: "//LineBlock") as! SKSpriteNode
         
         ball.physicsBody?.isDynamic = false
         ballStartingPosition = ball.position
@@ -50,13 +54,30 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
- 
-        if setupMode == true /*game on*/ {
-            play()
-        } else /* restart*/ {
-            reset()
+        let touch:UITouch = touches.first!
+        let positionInScene = touch.location(in: self)
+        let touchedNode = self.atPoint(positionInScene)
+        
+        if touchedNode == playButton {
+            if setupMode == true {
+                play()
+            } else {
+                reset()
+            }
         }
     }
+    
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        let touch:UITouch = touches.first!
+        let positionInScene = touch.location(in: self)
+        let touchedNode = self.atPoint(positionInScene)
+        
+        if touchedNode == lineBlock {
+            print("touched lineblock")
+            lineBlock.run(SKAction.move(to: positionInScene, duration: 0.0))
+        }
+    }
+    
     func play() {
         
         ball.physicsBody?.isDynamic = true /* drop the ball*/
@@ -98,7 +119,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     
-    func    didBegin(_ contact: SKPhysicsContact) {
+    func didBegin(_ contact: SKPhysicsContact) {
         /* collision detections*/
         print("contact between two objects")
         switch contact.bodyA.node!.name! {
