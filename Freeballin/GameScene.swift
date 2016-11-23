@@ -37,7 +37,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         physicsWorld.contactDelegate = self
         
         ball = self.childNode(withName: "//ball") as! SKSpriteNode
-        finishCup = self.childNode(withName: "//FinishCup") as! SKSpriteNode
+        finishCup = self.childNode(withName: "//RedCupPhysicsBody") as! SKSpriteNode
         playIcon = self.childNode(withName: "//PlayIcon") as! SKSpriteNode
         stopIcon = self.childNode(withName: "//StopIcon") as! SKSpriteNode
         
@@ -96,11 +96,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     
-    func didBegin(_ contact: SKPhysicsContact) {
+    func    didBegin(_ contact: SKPhysicsContact) {
         /* collision detections*/
         print("contact between two objects")
         switch contact.bodyA.node!.name! {
-        case "FinishCup":
+        case "RedCupPhysicsBody":
+            let cupSound = SKAction.playSoundFileNamed("redcup.wav", waitForCompletion: false)
+            self.run(cupSound)
             finishCupCollision()
         default:
             break
