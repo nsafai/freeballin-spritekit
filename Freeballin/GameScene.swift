@@ -70,7 +70,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         let touch = touches.first!
         let positionInScene = touch.location(in: self)
-        let previousPosition = touch.location(in: self)
+        let previousPosition = touch.previousLocation(in: self)
         let translation = CGVector(dx: positionInScene.x - previousPosition.x, dy: positionInScene.y - previousPosition.y)
         let touchedNode = atPoint(positionInScene)
         
