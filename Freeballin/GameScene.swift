@@ -67,7 +67,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func reset() {
         setupMode = true
-        ball.position = ballStartingPosition
+        ball.run(SKAction.move(to: ballStartingPosition, duration: 0.0))
         ball.physicsBody?.isDynamic = false
         determineLogo()
     }
@@ -82,27 +82,28 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     
-    func gameOver() {
+    func finishCupCollision() {
+        print("victory")
         /* play SFX*/
         reset()
     }
     
-    func didBegin(_ contact: SKPhysicsContact) {
-        print("contact between two objects")
-        if ((contact.bodyA.node?.name == "ball") && (contact.bodyB.node?.name == "finishCup")) {
-                /* victory */
-                gameOver()
-        }
-        
-    }
-    
-    
     override func update(_ currentTime: TimeInterval) {
-        /* Called before each frame is rendered */
-        
+        /* function is called before each frame is rendered */
         if (!intersects(ball)) {
             print("ball left the scene")
-            gameOver()
+            reset()
+        }
+    }
+    
+    func didBegin(_ contact: SKPhysicsContact) {
+        /* collision detections*/
+        print("contact between two objects")
+        switch contact.bodyA.node!.name! {
+        case "FinishCup":
+            finishCupCollision()
+        default:
+            break
         }
     }
 }
