@@ -29,8 +29,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     override func sceneDidLoad() {
         setupMode = true
-        timer = 0.0
-        timerLabel.text = ""
     }
     
     override func didMove(to view: SKView) {
@@ -50,6 +48,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         finishCup.physicsBody!.contactTestBitMask = finishCup.physicsBody!.collisionBitMask
         rotationRecognizer = UIRotationGestureRecognizer(target: self, action: #selector(rotate(_:)))
         view.addGestureRecognizer(rotationRecognizer!)
+        timer = 0.0
+        timerLabel.text = "invisible text"
+        timerLabel.alpha = 0
     }
     
     override func update(_ currentTime: TimeInterval) {
@@ -59,11 +60,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             reset()
         }
         if setupMode == false {
-//            timerLabel.alpha = 1
+            timerLabel.alpha = 1
             timer = timer + 1/60 /* 1/60 because the update function is run 60 times a second) */
             let unit = "s"
             timerLabel.text = String.localizedStringWithFormat("%.2f %@", timer, unit)
-
         } else {
 //            timerLabel.alpha = 0
         }
