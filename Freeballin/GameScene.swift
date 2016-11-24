@@ -8,6 +8,7 @@
 
 import SpriteKit
 import GameplayKit
+import UIKit
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
     
@@ -30,11 +31,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     private var label : SKLabelNode?
     private var spinnyNode : SKShapeNode?
     
+    var rotationRecognizer: UIRotationGestureRecognizer?
+    
     override func sceneDidLoad() {
-
         self.lastUpdateTime = 0
-            setupMode = true
-        }
+        setupMode = true
+    }
+ 
+    func handleRotation(sender: UIRotationGestureRecognizer) {
+            print("rotation recognized")
+    }
+    
     override func didMove(to view: SKView) {
         /* Setup the scene */
         physicsWorld.contactDelegate = self
@@ -51,13 +58,23 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         ballStartingPosition = ball.position
         ball.physicsBody!.contactTestBitMask = ball.physicsBody!.collisionBitMask
         finishCup.physicsBody!.contactTestBitMask = finishCup.physicsBody!.collisionBitMask
+        
+        rotationRecognizer = UIRotationGestureRecognizer(target: self, action: #selector(rotate(_:)))
+        view.addGestureRecognizer(rotationRecognizer!)
+        
+            }
+    
+    func rotate(_ sender: UIRotationGestureRecognizer){
+        print("rotation WORKS")
+        lineBlock.run(SKAction.rotate(byAngle: (-(self.rotationRecognizer?.rotation)!/4), duration: 0.0))
+//            lineBlock.parent!.parent!.run(SKAction.move(by: translation, duration: 0.0))
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         let touch:UITouch = touches.first!
         let positionInScene = touch.location(in: self)
         let touchedNode = self.atPoint(positionInScene)
-        
+    
         if touchedNode == playButton {
             if setupMode == true {
                 play()
@@ -72,14 +89,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let positionInScene = touch.location(in: self)
         let previousPosition = touch.previousLocation(in: self)
         let translation = CGVector(dx: positionInScene.x - previousPosition.x, dy: positionInScene.y - previousPosition.y)
-        let touchedNode = atPoint(positionInScene)
+        /*fat finger code*/
+        let fingerTolerance: CGFloat = 0.1
+        let fingerRect = CGRect(origin: CGPoint(x: positionInScene.x - fingerTolerance, y: positionInScene.y - fingerTolerance), size: CGSize(width: fingerTolerance*2, height: fingerTolerance*2))
+        let touchedNodePhysics = physicsWorld.body(in: fingerRect)?.node!
         
-        if true {
-            print("trying to move lineblock")
-            lineBlock.run(SKAction.move(by: translation, duration: 0.0))
+        if touchedNodePhysics == lineBlock {
+            lineBlock.parent!.parent!.run(SKAction.move(by: translation, duration: 0.0))
         }
     }
-    //            lineBlock.run(SKAction.move(to: CGPoint(x: lineBlock.position.x + translation.x, y: lineBlock.position.y + translation.y), duration: 0.0))
+    
     func play() {
         
         ball.physicsBody?.isDynamic = true /* drop the ball*/
