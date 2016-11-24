@@ -63,9 +63,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func rotate(_ sender: UIRotationGestureRecognizer){
-        if lineBlock.selected == true {
-            lineBlock.run(SKAction.rotate(byAngle: (-(self.rotationRecognizer?.rotation)!*2), duration: 0.0))
-            rotationRecognizer?.rotation = 0
+        if setupMode == true {
+            if lineBlock.selected == true {
+                lineBlock.run(SKAction.rotate(byAngle: (-(self.rotationRecognizer?.rotation)!*2), duration: 0.0))
+                rotationRecognizer?.rotation = 0
+            }
         }
     }
     
@@ -104,10 +106,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let fingerRect = CGRect(origin: CGPoint(x: (positionInScene?.x)! - fingerTolerance, y: (positionInScene?.y)! - fingerTolerance), size: CGSize(width: fingerTolerance*2, height: fingerTolerance*2))
         let touchedNodePhysics = physicsWorld.body(in: fingerRect)?.node!
         
-        if touchedNodePhysics == lineBlock {
-            lineBlock.parent!.parent!.run(SKAction.move(by: translation, duration: 0.0))
-            lineBlock.selected = true
-            print("touching lineBlock, detected by touchesMoved()")
+        if setupMode == true {
+            if touchedNodePhysics == lineBlock {
+                lineBlock.parent!.parent!.run(SKAction.move(by: translation, duration: 0.0))
+                lineBlock.selected = true
+                print("touching lineBlock, detected by touchesMoved()")
+            }
         }
     }
     
