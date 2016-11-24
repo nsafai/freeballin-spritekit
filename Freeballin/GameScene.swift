@@ -59,7 +59,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         if setupMode == false {
             timerLabel.alpha = 1
             timer = timer + 1/60 /* 1/60 because the update function is run 60 times a second) */
-            timerLabel.text = "\(timer)"
+            timerLabel.text = String.localizedStringWithFormat("%.2f %@", timer)
         } else {
             timerLabel.alpha = 0
         }
