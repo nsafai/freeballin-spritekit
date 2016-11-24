@@ -11,15 +11,6 @@ import GameplayKit
 import UIKit
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
-    
-    /* boiler plate variables */
-    var entities = [GKEntity]()
-    var graphs = [String : GKGraph]()
-    
-    //    private var lastUpdateTime : TimeInterval = 0
-    //    private var label : SKLabelNode?
-    //    private var spinnyNode : SKShapeNode?
-
     var ball: SKSpriteNode!
     var finishCup: SKSpriteNode!
     var insideCup: SKSpriteNode!
@@ -27,24 +18,22 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var playButton: SKSpriteNode!
     var stopIcon: SKSpriteNode!
     var lineBlock: MovableBlock!
-    
+    var timerLabel: SKLabelNode!
     var setupMode: Bool = true
     var ballStartingPosition = CGPoint()
-    
     var touch: UITouch?
     var positionInScene: CGPoint?
     var touchedNode: SKNode?
     var rotationRecognizer: UIRotationGestureRecognizer?
+    var timer: Float = 0.0
     
     override func sceneDidLoad() {
-//        self.lastUpdateTime = 0
         setupMode = true
     }
     
     override func didMove(to view: SKView) {
         /* Setup the scene */
         physicsWorld.contactDelegate = self
-        
         ball = self.childNode(withName: "//ball") as! SKSpriteNode
         finishCup = self.childNode(withName: "//RedCupPhysicsBody") as! SKSpriteNode
         insideCup = self.childNode(withName: "//InsideCup") as! SKSpriteNode
@@ -52,16 +41,31 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         playButton = self.childNode(withName: "//PlayButton") as! SKSpriteNode
         stopIcon = self.childNode(withName: "//StopIcon") as! SKSpriteNode
         lineBlock = self.childNode(withName: "//LineBlock") as! SKSpriteNode as! MovableBlock
-        
+        timerLabel = self.childNode(withName: "//TimerLabel") as! SKLabelNode
         ball.physicsBody?.isDynamic = false
         ballStartingPosition = ball.position
         ball.physicsBody!.contactTestBitMask = ball.physicsBody!.collisionBitMask
         finishCup.physicsBody!.contactTestBitMask = finishCup.physicsBody!.collisionBitMask
-        
         rotationRecognizer = UIRotationGestureRecognizer(target: self, action: #selector(rotate(_:)))
         view.addGestureRecognizer(rotationRecognizer!)
     }
     
+    override func update(_ currentTime: TimeInterval) {
+        /* function is called before each frame is rendered */
+        if (!intersects(ball)) {
+            print("ball left the scene")
+            reset()
+        }
+        if setupMode == false {
+            timerLabel.alpha = 1
+            timer = timer + 1/60 /* 1/60 because the update function is run 60 times a second) */
+            timerLabel.text = "\(timer)"
+        } else {
+            timerLabel.alpha = 0
+        }
+        print("\(timer)")
+    }
+
     func rotate(_ sender: UIRotationGestureRecognizer){
         if setupMode == true {
             if lineBlock.selected == true {
@@ -75,9 +79,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         touch = touches.first!
         positionInScene = self.touch?.location(in: self)
         touchedNode = self.atPoint(positionInScene!)
-        
         switch touchedNode!.name! {
-        case "PlayButton":
+        case "PlayButton", "PlayIcon", "StopIcon":
             if setupMode == true {
                 play()
             } else {
@@ -105,7 +108,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let fingerTolerance: CGFloat = 0.1
         let fingerRect = CGRect(origin: CGPoint(x: (positionInScene?.x)! - fingerTolerance, y: (positionInScene?.y)! - fingerTolerance), size: CGSize(width: fingerTolerance*2, height: fingerTolerance*2))
         let touchedNodePhysics = physicsWorld.body(in: fingerRect)?.node!
-        
         if setupMode == true {
             if touchedNodePhysics == lineBlock {
                 lineBlock.parent!.parent!.run(SKAction.move(by: translation, duration: 0.0))
@@ -116,9 +118,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func play() {
-        
         ball.physicsBody?.isDynamic = true /* drop the ball*/
-        
         let wooshSound = SKAction.playSoundFileNamed("woosh.wav", waitForCompletion: false)
         self.run(wooshSound)
         setupMode = false
@@ -130,6 +130,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         ball.run(SKAction.move(to: ballStartingPosition, duration: 0.0))
         ball.physicsBody?.isDynamic = false
         determineLogo()
+        timer = 0.0
     }
     
     func determineLogo() {
@@ -148,19 +149,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         reset()
     }
     
-    override func update(_ currentTime: TimeInterval) {
-        /* function is called before each frame is rendered */
-        if (!intersects(ball)) {
-            print("ball left the scene")
-            reset()
-        }
-    }
-    
     func didBegin(_ contact: SKPhysicsContact) {
         /* collision detections*/
-        print("contact between two objects")
-        
-        
         switch contact.bodyA.node!.name! {
         case "RedCupPhysicsBody":
             let cupSound = SKAction.playSoundFileNamed("redcup.wav", waitForCompletion: false)
