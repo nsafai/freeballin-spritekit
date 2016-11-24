@@ -66,7 +66,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func rotate(_ sender: UIRotationGestureRecognizer){
         print("rotation WORKS")
-        lineBlock.run(SKAction.rotate(byAngle: (-(self.rotationRecognizer?.rotation)!/4), duration: 0.0))
+        lineBlock.run(SKAction.rotate(byAngle: (-(self.rotationRecognizer?.rotation)!*2), duration: 0.0))
+        rotationRecognizer?.rotation = 0
 //            lineBlock.parent!.parent!.run(SKAction.move(by: translation, duration: 0.0))
     }
     
