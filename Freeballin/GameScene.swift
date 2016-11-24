@@ -29,6 +29,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     override func sceneDidLoad() {
         setupMode = true
+        timer = 0.0
+        timerLabel.text = ""
     }
     
     override func didMove(to view: SKView) {
@@ -57,11 +59,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             reset()
         }
         if setupMode == false {
-            timerLabel.alpha = 1
+//            timerLabel.alpha = 1
             timer = timer + 1/60 /* 1/60 because the update function is run 60 times a second) */
-            timerLabel.text = String.localizedStringWithFormat("%.2f %@", timer)
+            let unit = "s"
+            timerLabel.text = String.localizedStringWithFormat("%.2f %@", timer, unit)
+
         } else {
-            timerLabel.alpha = 0
+//            timerLabel.alpha = 0
         }
         print("\(timer)")
     }
@@ -119,6 +123,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func play() {
         ball.physicsBody?.isDynamic = true /* drop the ball*/
+        timer = 0.0
         let wooshSound = SKAction.playSoundFileNamed("woosh.wav", waitForCompletion: false)
         self.run(wooshSound)
         setupMode = false
@@ -130,7 +135,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         ball.run(SKAction.move(to: ballStartingPosition, duration: 0.0))
         ball.physicsBody?.isDynamic = false
         determineLogo()
-        timer = 0.0
+//        timer = 0.0
     }
     
     func determineLogo() {
