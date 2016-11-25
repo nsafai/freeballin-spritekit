@@ -57,17 +57,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         /* function is called before each frame is rendered */
         if (!intersects(ball)) {
             print("ball left the scene")
-            reset()
+            gameOver()
         }
         if setupMode == false {
             timerLabel.alpha = 1
             timer = timer + 1/60 /* 1/60 because the update function is run 60 times a second) */
-            let unit = "s"
-            timerLabel.text = String.localizedStringWithFormat("%.2f %@", timer, unit)
-        } else {
-//            timerLabel.alpha = 0
         }
-        print("\(timer)")
+        let unit = "s"
+        timerLabel.text = String.localizedStringWithFormat("%.2f %@", timer, unit)
+    }
+    
+    func gameOver() {
+        timer = 0.0
+        reset()
     }
 
     func rotate(_ sender: UIRotationGestureRecognizer){
@@ -92,15 +94,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             }
         case "LineBlock":
             lineBlock.selected = true
-            print("touching lineBlock, detected by touchesBegan()")
+            print("touchesBegan()")
         default:
             break
         }
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        lineBlock.selected = false
-        print("let go of lineBlock, detected by touchesEnded()")
+        
+        let humanLagDelay = SKAction.wait(forDuration: (0.2))
+        lineBlock.run(humanLagDelay) {
+            self.lineBlock.selected = false
+            print("touchesEnded()")
+        }
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -116,7 +122,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             if touchedNodePhysics == lineBlock {
                 lineBlock.parent!.parent!.run(SKAction.move(by: translation, duration: 0.0))
                 lineBlock.selected = true
-                print("touching lineBlock, detected by touchesMoved()")
+//                print("touchesMoved()")
             }
         }
     }
@@ -135,7 +141,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         ball.run(SKAction.move(to: ballStartingPosition, duration: 0.0))
         ball.physicsBody?.isDynamic = false
         determineLogo()
-//        timer = 0.0
     }
     
     func determineLogo() {
