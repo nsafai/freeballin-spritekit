@@ -84,7 +84,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func rotate(_ sender: UIRotationGestureRecognizer){
         if setupMode == true {
             if lineBlock.selected == true {
-                (touchedNodeFat as! MovableBlock).run(SKAction.rotate(byAngle: (-(self.rotationRecognizer?.rotation)!*2), duration: 0.0))
+                lineBlock.run(SKAction.rotate(byAngle: (-(self.rotationRecognizer?.rotation)!*2), duration: 0.0))
                 rotationRecognizer?.rotation = 0
             }
         }
@@ -111,9 +111,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
         if touchedNodeFat?.name?.contains("LineBlock") == true {
             (touchedNodeFat as! MovableBlock).selected = true
-            print("touchesBegan(%@)", touchedNodeFat)
         }
-        print("touchesBegan()")
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -121,8 +119,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         positionInScene = self.touch?.location(in: self)
         let previousPosition = self.touch?.previousLocation(in: self)
         let translation = CGVector(dx: (positionInScene?.x)! - (previousPosition?.x)!, dy: (positionInScene?.y)! - (previousPosition?.y)!)
-
-        print(touchedNode?.name)
         
         if setupMode == true {
             if touchedNodeFat?.name?.contains("LineBlock") == true {
@@ -138,7 +134,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let humanLagDelay = SKAction.wait(forDuration: (0.2))
         lineBlock.run(humanLagDelay) {
             self.lineBlock.selected = false
-            print("touchesEnded()")
+//            print("touchesEnded()")
         }
     }
     
