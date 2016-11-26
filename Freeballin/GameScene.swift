@@ -26,6 +26,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var touchedNode: SKNode?
     var rotationRecognizer: UIRotationGestureRecognizer?
     var timer: Float = 0.0
+    var fingerTolerance: CGFloat?
+    var fingerRect: CGRect?
+    var touchedNodeFat: SKNode?
+    var levelHolder: SKNode!
     
     override func sceneDidLoad() {
         setupMode = true
@@ -40,7 +44,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         playIcon = self.childNode(withName: "//PlayIcon") as! SKSpriteNode
         playButton = self.childNode(withName: "//PlayButton") as! SKSpriteNode
         stopIcon = self.childNode(withName: "//StopIcon") as! SKSpriteNode
-        lineBlock = self.childNode(withName: "//LineBlock") as! SKSpriteNode as! MovableBlock
         timerLabel = self.childNode(withName: "//TimerLabel") as! SKLabelNode
         ball.physicsBody?.isDynamic = false
         ballStartingPosition = ball.position
@@ -51,6 +54,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         timer = 0.0
         timerLabel.text = "invisible text"
         timerLabel.alpha = 0
+        levelHolder = childNode(withName: "levelHolder")
+        /* Load Level 1 */
+        let resourcePath = Bundle.main.path(forResource: "//Level1", ofType: "sks")
+        let level = SKReferenceNode (url: URL (fileURLWithPath: resourcePath!))
+        levelHolder.addChild(level)
+        lineBlock = self.childNode(withName: "//LineBlock") as! SKSpriteNode as! MovableBlock
     }
     
     override func update(_ currentTime: TimeInterval) {
@@ -85,18 +94,42 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         touch = touches.first!
         positionInScene = self.touch?.location(in: self)
         touchedNode = self.atPoint(positionInScene!)
-        switch touchedNode!.name! {
-        case "PlayButton", "PlayIcon", "StopIcon":
+        /*fat finger code*/
+        fingerTolerance = 0.1
+        fingerRect = CGRect(origin: CGPoint(x: (positionInScene?.x)! - fingerTolerance!, y: (positionInScene?.y)! - fingerTolerance!), size: CGSize(width: fingerTolerance!*2, height: fingerTolerance!*2))
+        touchedNodeFat = physicsWorld.body(in: fingerRect!)?.node!
+        
+        switch touchedNode?.name {
+        case "PlayButton"?, "PlayIcon"?, "StopIcon"?:
             if setupMode == true {
                 play()
             } else {
-                reset()
+                gameOver()
             }
-        case "LineBlock":
-            lineBlock.selected = true
-            print("touchesBegan()")
         default:
             break
+        }
+        if touchedNode?.name == "LineBlock" {
+            lineBlock.selected = true
+            print("touchesBegan(lineBlock)")
+        }
+        print("touchesBegan()")
+    }
+    
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        touch = touches.first!
+        positionInScene = self.touch?.location(in: self)
+        let previousPosition = self.touch?.previousLocation(in: self)
+        let translation = CGVector(dx: (positionInScene?.x)! - (previousPosition?.x)!, dy: (positionInScene?.y)! - (previousPosition?.y)!)
+
+        print(touchedNode?.name)
+        
+        if setupMode == true {
+            if touchedNode?.name == "LineBlock" {
+                lineBlock.selected = true
+                lineBlock.parent!.parent!.run(SKAction.move(by: translation, duration: 0.0))
+//                print("touchesMoved()")
+            }
         }
     }
     
@@ -106,24 +139,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         lineBlock.run(humanLagDelay) {
             self.lineBlock.selected = false
             print("touchesEnded()")
-        }
-    }
-    
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        touch = touches.first!
-        positionInScene = self.touch?.location(in: self)
-        let previousPosition = self.touch?.previousLocation(in: self)
-        let translation = CGVector(dx: (positionInScene?.x)! - (previousPosition?.x)!, dy: (positionInScene?.y)! - (previousPosition?.y)!)
-        /*fat finger code*/
-        let fingerTolerance: CGFloat = 0.1
-        let fingerRect = CGRect(origin: CGPoint(x: (positionInScene?.x)! - fingerTolerance, y: (positionInScene?.y)! - fingerTolerance), size: CGSize(width: fingerTolerance*2, height: fingerTolerance*2))
-        let touchedNodePhysics = physicsWorld.body(in: fingerRect)?.node!
-        if setupMode == true {
-            if touchedNodePhysics == lineBlock {
-                lineBlock.parent!.parent!.run(SKAction.move(by: translation, duration: 0.0))
-                lineBlock.selected = true
-//                print("touchesMoved()")
-            }
         }
     }
     
