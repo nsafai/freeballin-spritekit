@@ -84,7 +84,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func rotate(_ sender: UIRotationGestureRecognizer){
         if setupMode == true {
             if lineBlock.selected == true {
-                lineBlock.run(SKAction.rotate(byAngle: (-(self.rotationRecognizer?.rotation)!*2), duration: 0.0))
+                (touchedNodeFat as! MovableBlock).run(SKAction.rotate(byAngle: (-(self.rotationRecognizer?.rotation)!*2), duration: 0.0))
                 rotationRecognizer?.rotation = 0
             }
         }
@@ -109,9 +109,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         default:
             break
         }
-        if touchedNode?.name == "LineBlock" {
-            lineBlock.selected = true
-            print("touchesBegan(lineBlock)")
+        if touchedNodeFat?.name?.contains("LineBlock") == true {
+            (touchedNodeFat as! MovableBlock).selected = true
+            print("touchesBegan(%@)", touchedNodeFat)
         }
         print("touchesBegan()")
     }
@@ -125,9 +125,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         print(touchedNode?.name)
         
         if setupMode == true {
-            if touchedNode?.name == "LineBlock" {
-                lineBlock.selected = true
-                lineBlock.parent!.parent!.run(SKAction.move(by: translation, duration: 0.0))
+            if touchedNodeFat?.name?.contains("LineBlock") == true {
+                (touchedNodeFat as! MovableBlock).selected = true
+                (touchedNodeFat as! MovableBlock).parent!.parent!.run(SKAction.move(by: translation, duration: 0.0))
 //                print("touchesMoved()")
             }
         }
