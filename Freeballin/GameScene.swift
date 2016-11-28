@@ -29,7 +29,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var timer: Float = 0.0
     var fingerTolerance: CGFloat?
     var fingerRect: CGRect?
-//    var touchedNodeFat: SKNode?
+    //    var touchedNodeFat: SKNode?
     var levelHolder: SKNode!
     var rotationSelectedBlock: MovableBlock!
     var level: SKReferenceNode?
@@ -46,6 +46,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     var lastTrackerPosition = CGPoint(x: 0, y: 0)
     var lastTimeInterval:TimeInterval = 0
+    var cameraStartingPositionX: CGFloat?
+    var cameraStartingPositionY: CGFloat?
     
     override func sceneDidLoad() {
         setupMode = true
@@ -71,18 +73,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         levelNumber = 1
         numberOfLevels = 2
         loadLevel()
+        cameraStartingPositionX = camera?.position.x
+        cameraStartingPositionY = camera?.position.y
     }
     
     func loadLevel() {
-    let levelNumberString =  "//Level\(levelNumber!)"
-    let resourcePath = Bundle.main.path(forResource: levelNumberString, ofType: "sks")
-    level = SKReferenceNode (url: URL (fileURLWithPath: resourcePath!))
-    print("Loaded level # \(levelNumber)")
-    levelHolder.addChild(level!)
-    lineBlock = self.childNode(withName: "//LineBlock") as! SKSpriteNode as! MovableBlock
-    finishCup = self.childNode(withName: "//RedCupPhysicsBody") as! SKSpriteNode
-    insideCup = self.childNode(withName: "//InsideCup") as! SKSpriteNode
-
+        let levelNumberString =  "//Level\(levelNumber!)"
+        let resourcePath = Bundle.main.path(forResource: levelNumberString, ofType: "sks")
+        level = SKReferenceNode (url: URL (fileURLWithPath: resourcePath!))
+        print("Loaded level # \(levelNumber!)")
+        levelHolder.addChild(level!)
+        lineBlock = self.childNode(withName: "//LineBlock") as! SKSpriteNode as! MovableBlock
+        finishCup = self.childNode(withName: "//RedCupPhysicsBody") as! SKSpriteNode
+        insideCup = self.childNode(withName: "//InsideCup") as! SKSpriteNode
+        
     }
     
     func nextLevel() {
@@ -113,18 +117,25 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         timerLabel.text = String.localizedStringWithFormat("%.2f %@", timer, unit)
         /* Check there is a node to track and camera is present */
         if let trackerNode = trackerNode, let camera = camera {
-            /* Calculate horizontal distance to move */
+            /* Calculate distance to move */
             let moveDistanceX = trackerNode.position.x - lastTrackerPosition.x
             let moveDistanceY = trackerNode.position.y - lastTrackerPosition.y
             /* Duration is time between updates */
             let moveDuration = currentTime - lastTimeInterval
             /* Create a move action for the camera */
-            let moveCamera = SKAction.moveBy(x: 0, y: moveDistanceY, duration: moveDuration)
+            //            if trackerNode.position.x > self.view.width
+            
+            let distanceToFinish = abs(finishCup.parent!.parent!.position.y - trackerNode.position.y)
+            print(distanceToFinish)
+            //            if (distanceToFinish > 200) {
+            let moveCamera = SKAction.moveBy(x: 0, y: -moveDistanceY*trackerNode.position.y/500, duration: moveDuration)
             camera.run(moveCamera)
-            let moveButtons = SKAction.moveBy(x: moveDistanceX, y:moveDistanceY, duration: moveDuration)
-//            buttonContainerNode.run(moveButtons)
-            /* Store last trackerposition */
             lastTrackerPosition = trackerNode.position
+            //                let moveButtons = SKAction.moveBy(x: moveDistanceX, y:moveDistanceY, duration: moveDuration)
+            //                buttonContainerNode.run(moveButtons)
+            //            }
+            /* Store last trackerposition */
+            
         }
         /* Store current update step time */
         lastTimeInterval = currentTime
@@ -149,7 +160,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             if let selectedBlock = rotationSelectedBlock {
                 selectedBlock.run(SKAction.rotate(byAngle: (-(self.rotationRecognizer?.rotation)!*2), duration: 0.0))
                 rotationRecognizer?.rotation = 0
-             }
+            }
         }
         if (rotationRecognizer?.state == UIGestureRecognizerState.ended) {
             rotationSelectedBlock = nil
@@ -188,7 +199,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let translation = CGVector(dx: (positionInScene?.x)! - (previousPosition?.x)!, dy: (positionInScene?.y)! - (previousPosition?.y)!)
         if setupMode == true {
             if touchedNode?.name?.contains("LineBlock") == true {
-                 (touchedNode as! MovableBlock).parent!.parent!.run(SKAction.move(by: translation, duration: 0.0))
+                (touchedNode as! MovableBlock).parent!.parent!.run(SKAction.move(by: translation, duration: 0.0))
             }
         }
     }
@@ -214,7 +225,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func reset() {
         setupMode = true
-        ball.run(SKAction.move(to: ballStartingPosition, duration: 0.75))
+        ball.run(SKAction.move(to: ballStartingPosition, duration: 0.45))
+        camera?.run(SKAction.move(to: CGPoint.init(x: cameraStartingPositionX!, y: cameraStartingPositionY!), duration: 0.45))
         ball.physicsBody?.isDynamic = false
         determineLogo()
     }
