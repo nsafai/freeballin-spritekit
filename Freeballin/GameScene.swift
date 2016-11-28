@@ -75,7 +75,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     let levelNumberString =  "//Level\(levelNumber!)"
     let resourcePath = Bundle.main.path(forResource: levelNumberString, ofType: "sks")
     level = SKReferenceNode (url: URL (fileURLWithPath: resourcePath!))
-    print(levelNumber)
+    print("Loaded level # \(levelNumber)")
     levelHolder.addChild(level!)
     lineBlock = self.childNode(withName: "//LineBlock") as! SKSpriteNode as! MovableBlock
     finishCup = self.childNode(withName: "//RedCupPhysicsBody") as! SKSpriteNode
@@ -215,7 +215,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func reset() {
         setupMode = true
-        ball.run(SKAction.move(to: ballStartingPosition, duration: 0.0))
+        ball.run(SKAction.move(to: ballStartingPosition, duration: 0.75))
         ball.physicsBody?.isDynamic = false
         determineLogo()
     }
