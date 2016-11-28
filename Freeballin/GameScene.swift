@@ -19,6 +19,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var stopIcon: SKSpriteNode!
     var lineBlock: MovableBlock!
     var timerLabel: SKLabelNode!
+    var buttonContainerNode: SKNode!
     var setupMode: Bool = true
     var ballStartingPosition = CGPoint()
     var touch: UITouch?
@@ -58,6 +59,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         playButton = self.childNode(withName: "//PlayButton") as! SKSpriteNode
         stopIcon = self.childNode(withName: "//StopIcon") as! SKSpriteNode
         timerLabel = self.childNode(withName: "//TimerLabel") as! SKLabelNode
+        buttonContainerNode = self.childNode(withName: "//ButtonContainerNode") as SKNode!
         ball.physicsBody?.isDynamic = false
         ballStartingPosition = ball.position
         rotationRecognizer = UIRotationGestureRecognizer(target: self, action: #selector(rotate(_:)))
@@ -109,24 +111,21 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
         let unit = "s"
         timerLabel.text = String.localizedStringWithFormat("%.2f %@", timer, unit)
-        
         /* Check there is a node to track and camera is present */
         if let trackerNode = trackerNode, let camera = camera {
-            
             /* Calculate horizontal distance to move */
-            let moveDistance = trackerNode.position.x - lastTrackerPosition.x
-            
+            let moveDistanceX = trackerNode.position.x - lastTrackerPosition.x
+            let moveDistanceY = trackerNode.position.y - lastTrackerPosition.y
             /* Duration is time between updates */
             let moveDuration = currentTime - lastTimeInterval
-            
             /* Create a move action for the camera */
-            let moveCamera = SKAction.moveBy(x: moveDistance, y: 0, duration: moveDuration)
+            let moveCamera = SKAction.moveBy(x: 0, y: moveDistanceY, duration: moveDuration)
             camera.run(moveCamera)
-            
-            /* Store last tracker position */
+            let moveButtons = SKAction.moveBy(x: moveDistanceX, y:moveDistanceY, duration: moveDuration)
+//            buttonContainerNode.run(moveButtons)
+            /* Store last trackerposition */
             lastTrackerPosition = trackerNode.position
         }
-        
         /* Store current update step time */
         lastTimeInterval = currentTime
     }
