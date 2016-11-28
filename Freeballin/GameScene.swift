@@ -28,9 +28,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var timer: Float = 0.0
     var fingerTolerance: CGFloat?
     var fingerRect: CGRect?
-    var touchedNodeFat: SKNode?
+//    var touchedNodeFat: SKNode?
     var levelHolder: SKNode!
     var rotationSelectedBlock: MovableBlock!
+    var level: SKReferenceNode?
+    var levelNumber: Int!
+    var numberOfLevels: Int!
     
     override func sceneDidLoad() {
         setupMode = true
@@ -40,27 +43,47 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         /* Setup the scene */
         physicsWorld.contactDelegate = self
         ball = self.childNode(withName: "//ball") as! SKSpriteNode
-        finishCup = self.childNode(withName: "//RedCupPhysicsBody") as! SKSpriteNode
-        insideCup = self.childNode(withName: "//InsideCup") as! SKSpriteNode
         playIcon = self.childNode(withName: "//PlayIcon") as! SKSpriteNode
         playButton = self.childNode(withName: "//PlayButton") as! SKSpriteNode
         stopIcon = self.childNode(withName: "//StopIcon") as! SKSpriteNode
         timerLabel = self.childNode(withName: "//TimerLabel") as! SKLabelNode
         ball.physicsBody?.isDynamic = false
         ballStartingPosition = ball.position
-        ball.physicsBody!.contactTestBitMask = ball.physicsBody!.collisionBitMask
-        finishCup.physicsBody!.contactTestBitMask = finishCup.physicsBody!.collisionBitMask
         rotationRecognizer = UIRotationGestureRecognizer(target: self, action: #selector(rotate(_:)))
         view.addGestureRecognizer(rotationRecognizer!)
         timer = 0.0
         timerLabel.text = "invisible text"
         timerLabel.alpha = 0
         levelHolder = childNode(withName: "levelHolder")
-        /* Load Level 1 */
-        let resourcePath = Bundle.main.path(forResource: "//Level1", ofType: "sks")
-        let level = SKReferenceNode (url: URL (fileURLWithPath: resourcePath!))
-        levelHolder.addChild(level)
-        lineBlock = self.childNode(withName: "//LineBlock") as! SKSpriteNode as! MovableBlock
+        levelNumber = 1
+        numberOfLevels = 2
+        loadLevel()
+    }
+    
+    func loadLevel() {
+    let levelNumberString =  "//Level\(levelNumber!)"
+    let resourcePath = Bundle.main.path(forResource: levelNumberString, ofType: "sks")
+    level = SKReferenceNode (url: URL (fileURLWithPath: resourcePath!))
+    print(levelNumber)
+    levelHolder.addChild(level!)
+    lineBlock = self.childNode(withName: "//LineBlock") as! SKSpriteNode as! MovableBlock
+    finishCup = self.childNode(withName: "//RedCupPhysicsBody") as! SKSpriteNode
+    insideCup = self.childNode(withName: "//InsideCup") as! SKSpriteNode
+
+    }
+    
+    func nextLevel() {
+        levelHolder.removeAllChildren()
+        let levelLoadDelay = SKAction.wait(forDuration: (0.3))
+        self.run(levelLoadDelay) {
+            if self.levelNumber == self.numberOfLevels {
+                self.levelNumber = 1
+                self.loadLevel()
+            } else {
+                self.levelNumber = self.levelNumber! + 1
+                self.loadLevel()
+            }
+        }
     }
     
     override func update(_ currentTime: TimeInterval) {
@@ -87,8 +110,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             
             let rotationTouchLocation = self.view?.convert(sender.location(in: self.view), to: self)
             let rotationTouchedNode = self.atPoint(rotationTouchLocation!)
-            print("rotationTouchedNode in rotate: is \(rotationTouchedNode.name)")
-            
             if rotationTouchedNode.name?.contains("LineBlock") == true {
                 if rotationSelectedBlock == nil {
                     (rotationTouchedNode as! MovableBlock).selected = true
@@ -101,7 +122,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
              }
         }
         if (rotationRecognizer?.state == UIGestureRecognizerState.ended) {
-            print("Rotation recognizer ended")
             rotationSelectedBlock = nil
         }
     }
@@ -114,8 +134,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         /*fat finger code*/
         fingerTolerance = 0.1
         fingerRect = CGRect(origin: CGPoint(x: (positionInScene?.x)! - fingerTolerance!, y: (positionInScene?.y)! - fingerTolerance!), size: CGSize(width: fingerTolerance!*2, height: fingerTolerance!*2))
-        touchedNodeFat = physicsWorld.body(in: fingerRect!)?.node!
-        
+        let touchedNodeFat = physicsWorld.body(in: fingerRect!)?.node!
         switch touchedNode?.name {
         case "PlayButton"?, "PlayIcon"?, "StopIcon"?:
             if setupMode == true {
@@ -136,10 +155,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         positionInScene = self.touch?.location(in: self)
         let previousPosition = self.touch?.previousLocation(in: self)
         let translation = CGVector(dx: (positionInScene?.x)! - (previousPosition?.x)!, dy: (positionInScene?.y)! - (previousPosition?.y)!)
-        
         if setupMode == true {
-            if touchedNodeFat?.name?.contains("LineBlock") == true {
-                 (touchedNodeFat as! MovableBlock).parent!.parent!.run(SKAction.move(by: translation, duration: 0.0))
+            if touchedNode?.name?.contains("LineBlock") == true {
+                 (touchedNode as! MovableBlock).parent!.parent!.run(SKAction.move(by: translation, duration: 0.0))
             }
         }
     }
@@ -151,7 +169,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             self.lineBlock.selected = false
             self.rotationSelectedBlock = nil
         }
-        print("touchesEnded()")
     }
     
     func play() {
@@ -182,6 +199,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func finishCupCollision() {
         print("victory")
+        nextLevel()
         /* play SFX*/
         reset()
     }
