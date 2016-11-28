@@ -34,6 +34,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var level: SKReferenceNode?
     var levelNumber: Int!
     var numberOfLevels: Int!
+    /* Tracking helpers */
+    var trackerNode: SKNode? {
+        didSet {
+            if let trackerNode = trackerNode {
+                /* Set tracker */
+                lastTrackerPosition = trackerNode.position
+            }
+        }
+    }
+    var lastTrackerPosition = CGPoint(x: 0, y: 0)
+    var lastTimeInterval:TimeInterval = 0
     
     override func sceneDidLoad() {
         setupMode = true
@@ -98,6 +109,26 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
         let unit = "s"
         timerLabel.text = String.localizedStringWithFormat("%.2f %@", timer, unit)
+        
+        /* Check there is a node to track and camera is present */
+        if let trackerNode = trackerNode, let camera = camera {
+            
+            /* Calculate horizontal distance to move */
+            let moveDistance = trackerNode.position.x - lastTrackerPosition.x
+            
+            /* Duration is time between updates */
+            let moveDuration = currentTime - lastTimeInterval
+            
+            /* Create a move action for the camera */
+            let moveCamera = SKAction.moveBy(x: moveDistance, y: 0, duration: moveDuration)
+            camera.run(moveCamera)
+            
+            /* Store last tracker position */
+            lastTrackerPosition = trackerNode.position
+        }
+        
+        /* Store current update step time */
+        lastTimeInterval = currentTime
     }
     
     func gameOver() {
@@ -137,6 +168,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let touchedNodeFat = physicsWorld.body(in: fingerRect!)?.node!
         switch touchedNode?.name {
         case "PlayButton"?, "PlayIcon"?, "StopIcon"?:
+            /* Set tracker to follow penguin */
             if setupMode == true {
                 play()
             } else {
@@ -178,6 +210,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.run(wooshSound)
         setupMode = false
         determineLogo()
+        trackerNode = ball
     }
     
     func reset() {
