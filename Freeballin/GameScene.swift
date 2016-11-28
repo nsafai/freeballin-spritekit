@@ -128,14 +128,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             let distanceToFinish = abs(finishCup.parent!.parent!.position.y - trackerNode.position.y)
             print(distanceToFinish)
             //            if (distanceToFinish > 200) {
-            let moveCamera = SKAction.moveBy(x: 0, y: -moveDistanceY*trackerNode.position.y/500, duration: moveDuration)
+            var naturalCameraAcceleration = -moveDistanceY*trackerNode.position.y/500
+            let moveCamera = SKAction.moveBy(x: 0, y: naturalCameraAcceleration, duration: moveDuration)
             camera.run(moveCamera)
+            timerLabel.run(moveCamera)
             lastTrackerPosition = trackerNode.position
-            //                let moveButtons = SKAction.moveBy(x: moveDistanceX, y:moveDistanceY, duration: moveDuration)
-            //                buttonContainerNode.run(moveButtons)
-            //            }
-            /* Store last trackerposition */
-            
         }
         /* Store current update step time */
         lastTimeInterval = currentTime
