@@ -19,6 +19,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var stopIcon: SKSpriteNode!
     var lineBlock: MovableBlock!
     var timerLabel: SKLabelNode!
+    var timerLabelDescription: SKLabelNode!
+    var bestTimeLabel: SKLabelNode!
+    var bestTimeLabelDescription: SKLabelNode!
+    var timerContainerNode: SKNode!
     var buttonContainerNode: SKNode!
     var setupMode: Bool = true
     var ballStartingPosition = CGPoint()
@@ -46,8 +50,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     var lastTrackerPosition = CGPoint(x: 0, y: 0)
     var lastTimeInterval:TimeInterval = 0
-    var cameraStartingPositionX: CGFloat?
-    var cameraStartingPositionY: CGFloat?
+    var cameraStartingPosition: CGPoint?
+    var timerLabelStartingPosition: CGPoint?
     
     override func sceneDidLoad() {
         setupMode = true
@@ -61,20 +65,23 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         playButton = self.childNode(withName: "//PlayButton") as! SKSpriteNode
         stopIcon = self.childNode(withName: "//StopIcon") as! SKSpriteNode
         timerLabel = self.childNode(withName: "//TimerLabel") as! SKLabelNode
+        timerLabelDescription = self.childNode(withName: "//TimerLabelDescription") as! SKLabelNode
+        bestTimeLabel = self.childNode(withName: "//BestTimeLabel") as! SKLabelNode
+        bestTimeLabelDescription = self.childNode(withName: "//BestTimeLabelDescription") as! SKLabelNode
+        timerContainerNode = self.childNode(withName: "TimerContainerNode") as SKNode!
         buttonContainerNode = self.childNode(withName: "//ButtonContainerNode") as SKNode!
         ball.physicsBody?.isDynamic = false
         ballStartingPosition = ball.position
         rotationRecognizer = UIRotationGestureRecognizer(target: self, action: #selector(rotate(_:)))
         view.addGestureRecognizer(rotationRecognizer!)
         timer = 0.0
-        timerLabel.text = "invisible text"
-        timerLabel.alpha = 0
+
         levelHolder = childNode(withName: "levelHolder")
         levelNumber = 1
         numberOfLevels = 2
         loadLevel()
-        cameraStartingPositionX = camera?.position.x
-        cameraStartingPositionY = camera?.position.y
+        cameraStartingPosition = CGPoint.init(x: (camera?.position.x)!, y: (camera?.position.y)!)
+        timerLabelStartingPosition = CGPoint.init(x: (timerLabel?.position.x)!, y: (timerLabel?.position.y)!)
     }
     
     func loadLevel() {
@@ -109,12 +116,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             print("ball left the scene")
             gameOver()
         }
-        if setupMode == false {
-            timerLabel.alpha = 1
+        if (setupMode == false && ball.physicsBody?.isDynamic == true) {
+
             timer = timer + 1/60 /* 1/60 because the update function is run 60 times a second) */
         }
         let unit = "s"
         timerLabel.text = String.localizedStringWithFormat("%.2f %@", timer, unit)
+        bestTimeLabel.text = "--"
         /* Check there is a node to track and camera is present */
         if let trackerNode = trackerNode, let camera = camera {
             /* Calculate distance to move */
@@ -123,19 +131,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             /* Duration is time between updates */
             let moveDuration = currentTime - lastTimeInterval
             /* Create a move action for the camera */
-            //            if trackerNode.position.x > self.view.width
-            
-            let distanceToFinish = abs(finishCup.parent!.parent!.position.y - trackerNode.position.y)
-            print(distanceToFinish)
-            //            if (distanceToFinish > 200) {
-            var naturalCameraAcceleration = -moveDistanceY*trackerNode.position.y/500
-            let moveCamera = SKAction.moveBy(x: 0, y: naturalCameraAcceleration, duration: moveDuration)
+///            let naturalCameraAcceleration = -moveDistanceY*trackerNode.position.y/500
+            let moveCamera = SKAction.moveBy(x: 0, y: moveDistanceY, duration: moveDuration)
             camera.run(moveCamera)
-            timerLabel.run(moveCamera)
+            /* move the timer once button is off the screen */
+//            if (setupMode == false) {
+                timerContainerNode.run(moveCamera)
+//            }
             lastTrackerPosition = trackerNode.position
         }
         /* Store current update step time */
         lastTimeInterval = currentTime
+//        print("trackerNode X:\(trackerNode?.position.x) Y:\(trackerNode?.position.y))")
+//        print("camera X:\(camera?.position.x) Y:\(camera?.position.y)")
     }
     
     func gameOver() {
@@ -145,7 +153,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func rotate(_ sender: UIRotationGestureRecognizer){
         if setupMode == true {
-            
             let rotationTouchLocation = self.view?.convert(sender.location(in: self.view), to: self)
             let rotationTouchedNode = self.atPoint(rotationTouchLocation!)
             if rotationTouchedNode.name?.contains("LineBlock") == true {
@@ -165,9 +172,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        
         touch = touches.first!
         positionInScene = self.touch?.location(in: self)
+        print(positionInScene)
         touchedNode = self.atPoint(positionInScene!)
         /*fat finger code*/
         fingerTolerance = 0.1
@@ -187,6 +194,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         if touchedNodeFat?.name?.contains("LineBlock") == true {
             (touchedNodeFat as! MovableBlock).selected = true
         }
+
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -202,7 +210,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        
         let humanLagDelay = SKAction.wait(forDuration: (0.05))
         self.run(humanLagDelay) {
             self.lineBlock.selected = false
@@ -222,10 +229,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func reset() {
         setupMode = true
-        ball.run(SKAction.move(to: ballStartingPosition, duration: 0.45))
-        camera?.run(SKAction.move(to: CGPoint.init(x: cameraStartingPositionX!, y: cameraStartingPositionY!), duration: 0.45))
         ball.physicsBody?.isDynamic = false
         determineLogo()
+        resetCamera()
+    }
+    
+    func resetCamera() {
+        ball.run(SKAction.move(to: ballStartingPosition, duration: 0.35))
+        if camera == nil {
+            camera = self.childNode(withName: "camera") as! SKCameraNode?
+            camera?.run(SKAction.move(to: cameraStartingPosition!, duration: 0.35))
+            timerContainerNode.run(SKAction.move(to: timerLabelStartingPosition!, duration: 0.35))
+        }
     }
     
     func determineLogo() {
