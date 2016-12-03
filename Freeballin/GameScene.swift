@@ -131,13 +131,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             /* Duration is time between updates */
             let moveDuration = currentTime - lastTimeInterval
             /* Create a move action for the camera */
-///            let naturalCameraAcceleration = -moveDistanceY*trackerNode.position.y/500
-            let moveCamera = SKAction.moveBy(x: 0, y: moveDistanceY, duration: moveDuration)
-            camera.run(moveCamera)
-            /* move the timer once button is off the screen */
-//            if (setupMode == false) {
+           let naturalCameraAcceleration = -moveDistanceY*trackerNode.position.y/500
+            let moveCamera = SKAction.moveBy(x: 0, y: naturalCameraAcceleration, duration: moveDuration)
+            if /* ball has moved past half the screen*/ (abs((ball.position.y - ballStartingPosition.y)) > 200) {
+                camera.run(moveCamera)
                 timerContainerNode.run(moveCamera)
-//            }
+            }
+//            print(abs(ball.position.y - ballStartingPosition.y))
             lastTrackerPosition = trackerNode.position
         }
         /* Store current update step time */
@@ -232,15 +232,21 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         ball.physicsBody?.isDynamic = false
         determineLogo()
         resetCamera()
+        print("reset")
     }
     
     func resetCamera() {
         ball.run(SKAction.move(to: ballStartingPosition, duration: 0.35))
+        
         if camera == nil {
             camera = self.childNode(withName: "camera") as! SKCameraNode?
             camera?.run(SKAction.move(to: cameraStartingPosition!, duration: 0.35))
-            timerContainerNode.run(SKAction.move(to: timerLabelStartingPosition!, duration: 0.35))
+            print("reset camera")
+        } else {
+            camera?.run(SKAction.move(to: cameraStartingPosition!, duration: 0.35))
         }
+        timerContainerNode.run(SKAction.move(to: timerLabelStartingPosition!, duration: 0.35))
+
     }
     
     func determineLogo() {
