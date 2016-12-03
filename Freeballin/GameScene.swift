@@ -11,6 +11,7 @@ import GameplayKit
 import UIKit
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
+    var firstMovementWorthyCollisionDetected: Bool = false
     var ball: SKSpriteNode!
     var finishCup: SKSpriteNode!
     var insideCup: SKSpriteNode!
@@ -75,7 +76,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         rotationRecognizer = UIRotationGestureRecognizer(target: self, action: #selector(rotate(_:)))
         view.addGestureRecognizer(rotationRecognizer!)
         timer = 0.0
-
+        
         levelHolder = childNode(withName: "levelHolder")
         levelNumber = 1
         numberOfLevels = 2
@@ -117,7 +118,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             gameOver()
         }
         if (setupMode == false && ball.physicsBody?.isDynamic == true) {
-
+            
             timer = timer + 1/60 /* 1/60 because the update function is run 60 times a second) */
         }
         let unit = "s"
@@ -131,19 +132,21 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             /* Duration is time between updates */
             let moveDuration = currentTime - lastTimeInterval
             /* Create a move action for the camera */
-           let naturalCameraAcceleration = -moveDistanceY*trackerNode.position.y/500
+            let naturalCameraAcceleration = -moveDistanceY*trackerNode.position.y/800
             let moveCamera = SKAction.moveBy(x: 0, y: naturalCameraAcceleration, duration: moveDuration)
-            if /* ball has moved past half the screen*/ (abs((ball.position.y - ballStartingPosition.y)) > 230) {
-                camera.run(moveCamera)
-                timerContainerNode.run(moveCamera)
+            if firstMovementWorthyCollisionDetected == true {
+                if /* ball has moved past half the screen*/ (abs((ball.position.y - ballStartingPosition.y)) > 230) {
+                    camera.run(moveCamera)
+                    timerContainerNode.run(moveCamera)
+                }
             }
-//            print(abs(ball.position.y - ballStartingPosition.y))
+            //            print(abs(ball.position.y - ballStartingPosition.y))
             lastTrackerPosition = trackerNode.position
         }
         /* Store current update step time */
         lastTimeInterval = currentTime
-//        print("trackerNode X:\(trackerNode?.position.x) Y:\(trackerNode?.position.y))")
-//        print("camera X:\(camera?.position.x) Y:\(camera?.position.y)")
+        //        print("trackerNode X:\(trackerNode?.position.x) Y:\(trackerNode?.position.y))")
+        //        print("camera X:\(camera?.position.x) Y:\(camera?.position.y)")
     }
     
     func gameOver() {
@@ -194,7 +197,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         if touchedNodeFat?.name?.contains("LineBlock") == true {
             (touchedNodeFat as! MovableBlock).selected = true
         }
-
+        
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -232,7 +235,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         ball.physicsBody?.isDynamic = false
         determineLogo()
         resetCamera()
-        print("reset")
+        firstMovementWorthyCollisionDetected = false
+        print("reset complete")
     }
     
     func resetCamera() {
@@ -246,7 +250,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             camera?.run(SKAction.move(to: cameraStartingPosition!, duration: 0.35))
         }
         timerContainerNode.run(SKAction.move(to: timerContainerNodeStartingPosition!, duration: 0.35))
-
+        
     }
     
     func determineLogo() {
@@ -281,6 +285,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         case "LineBlock":
             let blockSound = SKAction.playSoundFileNamed("woodclick.wav", waitForCompletion: false)
             self.run(blockSound)
+            if /* ball has moved past half the screen*/ (abs((ball.position.y - ballStartingPosition.y)) > 230) {
+                firstMovementWorthyCollisionDetected = true
+            }
         default:
             break
         }
