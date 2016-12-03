@@ -51,7 +51,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var lastTrackerPosition = CGPoint(x: 0, y: 0)
     var lastTimeInterval:TimeInterval = 0
     var cameraStartingPosition: CGPoint?
-    var timerLabelStartingPosition: CGPoint?
+    var timerContainerNodeStartingPosition: CGPoint?
     
     override func sceneDidLoad() {
         setupMode = true
@@ -81,7 +81,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         numberOfLevels = 2
         loadLevel()
         cameraStartingPosition = CGPoint.init(x: (camera?.position.x)!, y: (camera?.position.y)!)
-        timerLabelStartingPosition = CGPoint.init(x: (timerLabel?.position.x)!, y: (timerLabel?.position.y)!)
+        timerContainerNodeStartingPosition = CGPoint.init(x: (timerContainerNode?.position.x)!, y: (timerContainerNode?.position.y)!)
     }
     
     func loadLevel() {
@@ -133,7 +133,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             /* Create a move action for the camera */
            let naturalCameraAcceleration = -moveDistanceY*trackerNode.position.y/500
             let moveCamera = SKAction.moveBy(x: 0, y: naturalCameraAcceleration, duration: moveDuration)
-            if /* ball has moved past half the screen*/ (abs((ball.position.y - ballStartingPosition.y)) > 200) {
+            if /* ball has moved past half the screen*/ (abs((ball.position.y - ballStartingPosition.y)) > 230) {
                 camera.run(moveCamera)
                 timerContainerNode.run(moveCamera)
             }
@@ -174,7 +174,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         touch = touches.first!
         positionInScene = self.touch?.location(in: self)
-        print(positionInScene)
+        print(positionInScene as Any)
         touchedNode = self.atPoint(positionInScene!)
         /*fat finger code*/
         fingerTolerance = 0.1
@@ -245,7 +245,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         } else {
             camera?.run(SKAction.move(to: cameraStartingPosition!, duration: 0.35))
         }
-        timerContainerNode.run(SKAction.move(to: timerLabelStartingPosition!, duration: 0.35))
+        timerContainerNode.run(SKAction.move(to: timerContainerNodeStartingPosition!, duration: 0.35))
 
     }
     
