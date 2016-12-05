@@ -71,8 +71,6 @@
 		8503D8351DE43B1A002B8A7F /* FinishCup.sks in Resources */ = {isa = PBXBuildFile; fileRef = 8503D8341DE43B19002B8A7F /* FinishCup.sks */; };
 		8503D8411DE57568002B8A7F /* LineBlock.sks in Resources */ = {isa = PBXBuildFile; fileRef = 8503D8401DE57568002B8A7F /* LineBlock.sks */; };
 		850E91021DE6BF1700FFAD62 /* MovableBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 850E91011DE6BF1700FFAD62 /* MovableBlock.swift */; };
-		856173321DE9271C00E07582 /* Level1.sks in Resources */ = {isa = PBXBuildFile; fileRef = 856173311DE9271C00E07582 /* Level1.sks */; };
-		8562D2EA1DEA859D00274D63 /* Level2.sks in Resources */ = {isa = PBXBuildFile; fileRef = 8562D2E91DEA859D00274D63 /* Level2.sks */; };
 		859F0F1B1DDFC29800882857 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 859F0F1A1DDFC29800882857 /* AppDelegate.swift */; };
 		859F0F1D1DDFC29800882857 /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 859F0F1C1DDFC29800882857 /* GameScene.sks */; };
 		859F0F1F1DDFC29800882857 /* Actions.sks in Resources */ = {isa = PBXBuildFile; fileRef = 859F0F1E1DDFC29800882857 /* Actions.sks */; };
@@ -82,6 +80,9 @@
 		859F0F281DDFC29800882857 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 859F0F271DDFC29800882857 /* Assets.xcassets */; };
 		859F0F2B1DDFC29800882857 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 859F0F291DDFC29800882857 /* LaunchScreen.storyboard */; };
 		859F0F471DDFF16E00882857 /* Ball.sks in Resources */ = {isa = PBXBuildFile; fileRef = 859F0F461DDFF16E00882857 /* Ball.sks */; };
+		85D248721DF3895C00ACC049 /* Level1.sks in Resources */ = {isa = PBXBuildFile; fileRef = 85D248701DF3895C00ACC049 /* Level1.sks */; };
+		85D248731DF3895C00ACC049 /* Level2.sks in Resources */ = {isa = PBXBuildFile; fileRef = 85D248711DF3895C00ACC049 /* Level2.sks */; };
+		85D248751DF3897300ACC049 /* Level3.sks in Resources */ = {isa = PBXBuildFile; fileRef = 85D248741DF3897300ACC049 /* Level3.sks */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -149,8 +150,6 @@
 		8503D8341DE43B19002B8A7F /* FinishCup.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = FinishCup.sks; sourceTree = "<group>"; };
 		8503D8401DE57568002B8A7F /* LineBlock.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = LineBlock.sks; sourceTree = "<group>"; };
 		850E91011DE6BF1700FFAD62 /* MovableBlock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MovableBlock.swift; sourceTree = "<group>"; };
-		856173311DE9271C00E07582 /* Level1.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Level1.sks; sourceTree = "<group>"; };
-		8562D2E91DEA859D00274D63 /* Level2.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Level2.sks; sourceTree = "<group>"; };
 		859F0F171DDFC29800882857 /* Freeballin.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Freeballin.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		859F0F1A1DDFC29800882857 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		859F0F1C1DDFC29800882857 /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
@@ -162,6 +161,9 @@
 		859F0F2A1DDFC29800882857 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		859F0F2C1DDFC29800882857 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		859F0F461DDFF16E00882857 /* Ball.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Ball.sks; sourceTree = "<group>"; };
+		85D248701DF3895C00ACC049 /* Level1.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Level1.sks; sourceTree = "<group>"; };
+		85D248711DF3895C00ACC049 /* Level2.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Level2.sks; sourceTree = "<group>"; };
+		85D248741DF3897300ACC049 /* Level3.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Level3.sks; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -243,15 +245,6 @@
 			path = SFX;
 			sourceTree = "<group>";
 		};
-		856173331DE9287300E07582 /* Levels */ = {
-			isa = PBXGroup;
-			children = (
-				856173311DE9271C00E07582 /* Level1.sks */,
-				8562D2E91DEA859D00274D63 /* Level2.sks */,
-			);
-			name = Levels;
-			sourceTree = "<group>";
-		};
 		859F0F0E1DDFC29700882857 = {
 			isa = PBXGroup;
 			children = (
@@ -271,7 +264,7 @@
 		859F0F191DDFC29800882857 /* Freeballin */ = {
 			isa = PBXGroup;
 			children = (
-				856173331DE9287300E07582 /* Levels */,
+				85D2486F1DF3895C00ACC049 /* Levels */,
 				859F0F1A1DDFC29800882857 /* AppDelegate.swift */,
 				859F0F1E1DDFC29800882857 /* Actions.sks */,
 				859F0F461DDFF16E00882857 /* Ball.sks */,
@@ -288,6 +281,16 @@
 				859F0F2C1DDFC29800882857 /* Info.plist */,
 			);
 			path = Freeballin;
+			sourceTree = "<group>";
+		};
+		85D2486F1DF3895C00ACC049 /* Levels */ = {
+			isa = PBXGroup;
+			children = (
+				85D248701DF3895C00ACC049 /* Level1.sks */,
+				85D248711DF3895C00ACC049 /* Level2.sks */,
+				85D248741DF3897300ACC049 /* Level3.sks */,
+			);
+			path = Levels;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -352,15 +355,17 @@
 			files = (
 				8503D8011DE42324002B8A7F /* dudeno.wav in Resources */,
 				8503D8151DE42324002B8A7F /* ohyeah.wav in Resources */,
+				85D248721DF3895C00ACC049 /* Level1.sks in Resources */,
 				8503D80A1DE42324002B8A7F /* lameyay.wav in Resources */,
-				8562D2EA1DEA859D00274D63 /* Level2.sks in Resources */,
 				8503D8331DE42324002B8A7F /* yes.wav in Resources */,
 				8503D8221DE42324002B8A7F /* shredderdan3.wav in Resources */,
 				8503D8211DE42324002B8A7F /* shredderdan2.wav in Resources */,
+				85D248731DF3895C00ACC049 /* Level2.sks in Resources */,
 				8503D8231DE42324002B8A7F /* slowdeath.wav in Resources */,
 				8503D81B1DE42324002B8A7F /* redcup.wav in Resources */,
 				8503D80D1DE42324002B8A7F /* meow2.wav in Resources */,
 				8503D82E1DE42324002B8A7F /* wreckingballthud.wav in Resources */,
+				85D248751DF3897300ACC049 /* Level3.sks in Resources */,
 				8503D8271DE42324002B8A7F /* water drip-04.wav in Resources */,
 				859F0F261DDFC29800882857 /* Main.storyboard in Resources */,
 				8503D7F71DE42324002B8A7F /* aah.wav in Resources */,
@@ -385,7 +390,6 @@
 				8503D81C1DE42324002B8A7F /* redcupdan.wav in Resources */,
 				8503D80F1DE42324002B8A7F /* niice.wav in Resources */,
 				8503D8131DE42324002B8A7F /* ohno.wav in Resources */,
-				856173321DE9271C00E07582 /* Level1.sks in Resources */,
 				8503D8291DE42324002B8A7F /* whimperohno.wav in Resources */,
 				8503D82F1DE42324002B8A7F /* wreckingballthud2.wav in Resources */,
 				859F0F281DDFC29800882857 /* Assets.xcassets in Resources */,

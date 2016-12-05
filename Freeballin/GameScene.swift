@@ -9,6 +9,7 @@
 import SpriteKit
 import GameplayKit
 import UIKit
+import AVFoundation
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
     var firstMovementWorthyCollisionDetected: Bool = false
@@ -53,6 +54,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var lastTimeInterval:TimeInterval = 0
     var cameraStartingPosition: CGPoint?
     var timerContainerNodeStartingPosition: CGPoint?
+    var buttonContainerNodeStartingPosition: CGPoint?
+    var audioSession : AVAudioSession?
     
     override func sceneDidLoad() {
         setupMode = true
@@ -60,6 +63,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     override func didMove(to view: SKView) {
         /* Setup the scene */
+        
+        /* setup sound */
+        setupSound()
+        
+        /* load sprites */
         physicsWorld.contactDelegate = self
         ball = self.childNode(withName: "//ball") as! SKSpriteNode
         playIcon = self.childNode(withName: "//PlayIcon") as! SKSpriteNode
@@ -73,16 +81,30 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         buttonContainerNode = self.childNode(withName: "//ButtonContainerNode") as SKNode!
         ball.physicsBody?.isDynamic = false
         ballStartingPosition = ball.position
+        
+        /* add rotation gesture recognizer */
         rotationRecognizer = UIRotationGestureRecognizer(target: self, action: #selector(rotate(_:)))
         view.addGestureRecognizer(rotationRecognizer!)
+        
+        /* set timer to 0.0 seconds */
         timer = 0.0
         
+        /* setup level constants */
         levelHolder = childNode(withName: "levelHolder")
         levelNumber = 1
-        numberOfLevels = 2
+        numberOfLevels = 3
         loadLevel()
+        
+        /* log initial locations so we can return back to these after game over or next level */
         cameraStartingPosition = CGPoint.init(x: (camera?.position.x)!, y: (camera?.position.y)!)
         timerContainerNodeStartingPosition = CGPoint.init(x: (timerContainerNode?.position.x)!, y: (timerContainerNode?.position.y)!)
+        buttonContainerNodeStartingPosition = CGPoint.init(x: (buttonContainerNode?.position.x)!, y: (buttonContainerNode?.position.y)!)
+    }
+    
+    func setupSound() {
+        /* allow background music to continue playing while playing game */
+        audioSession = AVAudioSession.sharedInstance()
+        try!audioSession?.setCategory(AVAudioSessionCategoryPlayback, with: AVAudioSessionCategoryOptions.mixWithOthers) // might consider using .duck to reduce music volume when game sounds are played
     }
     
     func loadLevel() {
@@ -94,7 +116,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         lineBlock = self.childNode(withName: "//LineBlock") as! SKSpriteNode as! MovableBlock
         finishCup = self.childNode(withName: "//RedCupPhysicsBody") as! SKSpriteNode
         insideCup = self.childNode(withName: "//InsideCup") as! SKSpriteNode
-        
     }
     
     func nextLevel() {
@@ -113,7 +134,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     override func update(_ currentTime: TimeInterval) {
         /* function is called before each frame is rendered */
-        if (!intersects(ball)) {
+        if level?.intersects(ball) == true {
+//        if (!intersects(ball)) {
             print("ball left the scene")
             gameOver()
         }
@@ -132,13 +154,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             /* Duration is time between updates */
             let moveDuration = currentTime - lastTimeInterval
             /* Create a move action for the camera */
-            let naturalCameraAcceleration = -moveDistanceY*trackerNode.position.y/800
+            let naturalCameraAcceleration = moveDistanceY
             let moveCamera = SKAction.moveBy(x: 0, y: naturalCameraAcceleration, duration: moveDuration)
             if firstMovementWorthyCollisionDetected == true {
                 if /* ball has moved past half the screen*/ (abs((ball.position.y - ballStartingPosition.y)) > 230) {
                     camera.run(moveCamera)
                     timerContainerNode.run(moveCamera)
+                    buttonContainerNode.run(moveCamera)
                 }
+            }
+            if (abs((ball.position.y - ballStartingPosition.y)) > 350) {
+                firstMovementWorthyCollisionDetected = true
             }
             //            print(abs(ball.position.y - ballStartingPosition.y))
             lastTrackerPosition = trackerNode.position
@@ -250,7 +276,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             camera?.run(SKAction.move(to: cameraStartingPosition!, duration: 0.35))
         }
         timerContainerNode.run(SKAction.move(to: timerContainerNodeStartingPosition!, duration: 0.35))
-        
+        buttonContainerNode.run(SKAction.move(to: buttonContainerNodeStartingPosition!, duration: 0.35))
     }
     
     func determineLogo() {
@@ -266,7 +292,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func finishCupCollision() {
         print("victory")
         nextLevel()
-        /* play SFX*/
         reset()
     }
     
