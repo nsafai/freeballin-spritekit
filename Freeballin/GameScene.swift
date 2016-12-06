@@ -12,7 +12,7 @@ import UIKit
 import AVFoundation
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
-    var firstMovementWorthyCollisionDetected: Bool = false
+    var movementWorthyEventHappened: Bool = false
     var ball: SKSpriteNode!
     var finishCup: SKSpriteNode!
     var insideCup: SKSpriteNode!
@@ -116,6 +116,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         lineBlock = self.childNode(withName: "//LineBlock") as! SKSpriteNode as! MovableBlock
         finishCup = self.childNode(withName: "//RedCupPhysicsBody") as! SKSpriteNode
         insideCup = self.childNode(withName: "//InsideCup") as! SKSpriteNode
+        print("level size: \(level?.scene?.size)")
+        /* display level instructions */
+        if levelNumber == 1 {
+            pulsate(pointOfInterest: playIcon)
+        } 
     }
     
     func nextLevel() {
@@ -130,49 +135,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 self.loadLevel()
             }
         }
-    }
-    
-    override func update(_ currentTime: TimeInterval) {
-        /* function is called before each frame is rendered */
-        if level?.intersects(ball) == true {
-//        if (!intersects(ball)) {
-            print("ball left the scene")
-            gameOver()
-        }
-        if (setupMode == false && ball.physicsBody?.isDynamic == true) {
-            
-            timer = timer + 1/60 /* 1/60 because the update function is run 60 times a second) */
-        }
-        let unit = "s"
-        timerLabel.text = String.localizedStringWithFormat("%.2f %@", timer, unit)
-        bestTimeLabel.text = "--"
-        /* Check there is a node to track and camera is present */
-        if let trackerNode = trackerNode, let camera = camera {
-            /* Calculate distance to move */
-            let moveDistanceX = trackerNode.position.x - lastTrackerPosition.x
-            let moveDistanceY = trackerNode.position.y - lastTrackerPosition.y
-            /* Duration is time between updates */
-            let moveDuration = currentTime - lastTimeInterval
-            /* Create a move action for the camera */
-            let naturalCameraAcceleration = moveDistanceY
-            let moveCamera = SKAction.moveBy(x: 0, y: naturalCameraAcceleration, duration: moveDuration)
-            if firstMovementWorthyCollisionDetected == true {
-                if /* ball has moved past half the screen*/ (abs((ball.position.y - ballStartingPosition.y)) > 230) {
-                    camera.run(moveCamera)
-                    timerContainerNode.run(moveCamera)
-                    buttonContainerNode.run(moveCamera)
-                }
-            }
-            if (abs((ball.position.y - ballStartingPosition.y)) > 350) {
-                firstMovementWorthyCollisionDetected = true
-            }
-            //            print(abs(ball.position.y - ballStartingPosition.y))
-            lastTrackerPosition = trackerNode.position
-        }
-        /* Store current update step time */
-        lastTimeInterval = currentTime
-        //        print("trackerNode X:\(trackerNode?.position.x) Y:\(trackerNode?.position.y))")
-        //        print("camera X:\(camera?.position.x) Y:\(camera?.position.y)")
     }
     
     func gameOver() {
@@ -203,7 +165,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         touch = touches.first!
         positionInScene = self.touch?.location(in: self)
-        print(positionInScene as Any)
+//        print(positionInScene as Any)
         touchedNode = self.atPoint(positionInScene!)
         /*fat finger code*/
         fingerTolerance = 0.1
@@ -261,7 +223,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         ball.physicsBody?.isDynamic = false
         determineLogo()
         resetCamera()
-        firstMovementWorthyCollisionDetected = false
+        movementWorthyEventHappened = false
         print("reset complete")
     }
     
@@ -310,11 +272,65 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         case "LineBlock":
             let blockSound = SKAction.playSoundFileNamed("woodclick.wav", waitForCompletion: false)
             self.run(blockSound)
-            if /* ball has moved past half the screen*/ (abs((ball.position.y - ballStartingPosition.y)) > 230) {
-                firstMovementWorthyCollisionDetected = true
-            }
         default:
             break
         }
     }
+    
+    func pulsate(pointOfInterest: SKNode) {
+        let pulseUp = SKAction.scale(to: 0.9, duration: 0.5)
+        let pulseDown = SKAction.scale(to: 0.6, duration: 0.5)
+        let pulse = SKAction.sequence([pulseUp, pulseDown])
+        let repeatPulse = SKAction.repeatForever(pulse)
+        pointOfInterest.run(repeatPulse)
+    }
+    
+    override func update(_ currentTime: TimeInterval) {
+        
+        /* function is called before each frame is rendered */
+        if level?.scene?.intersects(ball) != true {
+            //        if (!intersects(ball)) {
+            print("ball left the scene")
+            gameOver()
+        }
+        if (setupMode == false && ball.physicsBody?.isDynamic == true) {
+            
+            timer = timer + 1/60 /* 1/60 because the update function is run 60 times a second) */
+        }
+        let unit = "s"
+        timerLabel.text = String.localizedStringWithFormat("%.2f %@", timer, unit)
+        bestTimeLabel.text = "--"
+        /* Check there is a node to track and camera is present */
+        if let trackerNode = trackerNode, let camera = camera {
+            /* Calculate distance to move */
+            let moveDistanceX = trackerNode.position.x - lastTrackerPosition.x
+            let moveDistanceY = trackerNode.position.y - lastTrackerPosition.y
+            /* Duration is time between updates */
+            let moveDuration = currentTime - lastTimeInterval
+            /* Create a move action for the camera */
+            let naturalCameraAcceleration = moveDistanceY
+            let moveCamera = SKAction.moveBy(x: 0, y: naturalCameraAcceleration, duration: moveDuration)
+            if movementWorthyEventHappened == true {
+                if /* ball has moved past half the screen*/ (abs((ball.position.y - ballStartingPosition.y)) > 230) {
+                    camera.run(moveCamera)
+                    timerContainerNode.run(moveCamera)
+                    buttonContainerNode.run(moveCamera)
+                }
+            }
+            if (abs((ball.position.y - ballStartingPosition.y)) > 350) {
+                movementWorthyEventHappened = true
+            }
+            //            print(abs(ball.position.y - ballStartingPosition.y))
+            lastTrackerPosition = trackerNode.position
+            if  (abs((ball.position.y - ballStartingPosition.y)) > 230) { // 230 --> ball has moved past half the screen
+                movementWorthyEventHappened = true // even if no collision detected, camera needs to move
+            }
+        }
+        /* Store current update step time */
+        lastTimeInterval = currentTime
+        
+        //        print("trackerNode X:\(trackerNode?.position.x) Y:\(trackerNode?.position.y))")
+        //        print("camera X:\(camera?.position.x) Y:\(camera?.position.y)")
+    }
+    
 }
