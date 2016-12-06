@@ -24,8 +24,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var timerLabelDescription: SKLabelNode!
     var bestTimeLabel: SKLabelNode!
     var bestTimeLabelDescription: SKLabelNode!
+    var instructionArrow: SKSpriteNode!
     var timerContainerNode: SKNode!
     var buttonContainerNode: SKNode!
+    var levelBoundaryBottom: SKSpriteNode!
+    var levelBoundaryLeft: SKSpriteNode!
+    var levelBoundaryRight: SKSpriteNode!
     var setupMode: Bool = true
     var ballStartingPosition = CGPoint()
     var touch: UITouch?
@@ -116,11 +120,24 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         lineBlock = self.childNode(withName: "//LineBlock") as! SKSpriteNode as! MovableBlock
         finishCup = self.childNode(withName: "//RedCupPhysicsBody") as! SKSpriteNode
         insideCup = self.childNode(withName: "//InsideCup") as! SKSpriteNode
+        levelBoundaryBottom = self.childNode(withName: "//LevelBoundaryBottom") as! SKSpriteNode
+        levelBoundaryLeft = self.childNode(withName: "//LevelBoundaryLeft") as! SKSpriteNode
+        levelBoundaryRight = self.childNode(withName: "//LevelBoundaryRight") as! SKSpriteNode
         print("level size: \(level?.scene?.size)")
         /* display level instructions */
+        showLevelInstructions()
+    }
+    
+    func showLevelInstructions() {
         if levelNumber == 1 {
-            pulsate(pointOfInterest: playIcon)
-        } 
+            pulsate(pointOfInterest: playIcon) // user has never played before, highlight play icon
+        } else if levelNumber == 2 {
+            playIcon.removeAction(forKey: "pulsate")
+            instructionArrow = self.childNode(withName: "//InstructionArrow") as! SKSpriteNode
+            pulsate(pointOfInterest: instructionArrow)
+        } else {
+            playIcon.removeAction(forKey: "pulsate")
+        }
     }
     
     func nextLevel() {
@@ -165,15 +182,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         touch = touches.first!
         positionInScene = self.touch?.location(in: self)
-//        print(positionInScene as Any)
         touchedNode = self.atPoint(positionInScene!)
+        
         /*fat finger code*/
         fingerTolerance = 0.1
         fingerRect = CGRect(origin: CGPoint(x: (positionInScene?.x)! - fingerTolerance!, y: (positionInScene?.y)! - fingerTolerance!), size: CGSize(width: fingerTolerance!*2, height: fingerTolerance!*2))
         let touchedNodeFat = physicsWorld.body(in: fingerRect!)?.node!
+        
+        /* start / end game when top button pressed */
         switch touchedNode?.name {
         case "PlayButton"?, "PlayIcon"?, "StopIcon"?:
-            /* Set tracker to follow penguin */
             if setupMode == true {
                 play()
             } else {
@@ -182,6 +200,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         default:
             break
         }
+        
+        /* (possibly unnecessary) code to make selecting a block easier */
         if touchedNodeFat?.name?.contains("LineBlock") == true {
             (touchedNodeFat as! MovableBlock).selected = true
         }
@@ -191,6 +211,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         touch = touches.first!
         positionInScene = self.touch?.location(in: self)
+        
+        /* code to move a movable block */
         let previousPosition = self.touch?.previousLocation(in: self)
         let translation = CGVector(dx: (positionInScene?.x)! - (previousPosition?.x)!, dy: (positionInScene?.y)! - (previousPosition?.y)!)
         if setupMode == true {
@@ -201,6 +223,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        /* code to let go of a block */
         let humanLagDelay = SKAction.wait(forDuration: (0.05))
         self.run(humanLagDelay) {
             self.lineBlock.selected = false
@@ -212,10 +235,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         ball.physicsBody?.isDynamic = true /* drop the ball*/
         timer = 0.0
         let wooshSound = SKAction.playSoundFileNamed("woosh.wav", waitForCompletion: false)
-        self.run(wooshSound)
-        setupMode = false
-        determineLogo()
-        trackerNode = ball
+        self.run(wooshSound) /* SFX */
+        setupMode = false /* setupmode = false means movable blocks become immovable*/
+        determineLogo() /* determine whether to display play or stop icon */
+        trackerNode = ball /* camera trackernode */
     }
     
     func reset() {
@@ -282,24 +305,28 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let pulseDown = SKAction.scale(to: 0.6, duration: 0.5)
         let pulse = SKAction.sequence([pulseUp, pulseDown])
         let repeatPulse = SKAction.repeatForever(pulse)
-        pointOfInterest.run(repeatPulse)
+        pointOfInterest.run(repeatPulse, withKey: "pulsate")
     }
     
     override func update(_ currentTime: TimeInterval) {
-        
         /* function is called before each frame is rendered */
-        if level?.scene?.intersects(ball) != true {
-            //        if (!intersects(ball)) {
+        
+        /*if ball leaves allowed zone, game over */
+        if (levelBoundaryBottom.intersects(ball) == true) ||
+            (levelBoundaryLeft.intersects(ball) == true) ||
+            (levelBoundaryRight.intersects(ball) == true) {
             print("ball left the scene")
             gameOver()
         }
+        
+        /* timer code */
         if (setupMode == false && ball.physicsBody?.isDynamic == true) {
-            
             timer = timer + 1/60 /* 1/60 because the update function is run 60 times a second) */
         }
         let unit = "s"
         timerLabel.text = String.localizedStringWithFormat("%.2f %@", timer, unit)
         bestTimeLabel.text = "--"
+        
         /* Check there is a node to track and camera is present */
         if let trackerNode = trackerNode, let camera = camera {
             /* Calculate distance to move */
@@ -310,27 +337,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             /* Create a move action for the camera */
             let naturalCameraAcceleration = moveDistanceY
             let moveCamera = SKAction.moveBy(x: 0, y: naturalCameraAcceleration, duration: moveDuration)
+            let distanceBallTravelled = (abs((ball.position.y - ballStartingPosition.y)))
             if movementWorthyEventHappened == true {
-                if /* ball has moved past half the screen*/ (abs((ball.position.y - ballStartingPosition.y)) > 230) {
+                if /* ball has moved past half the screen*/ (distanceBallTravelled > 230) {
                     camera.run(moveCamera)
                     timerContainerNode.run(moveCamera)
                     buttonContainerNode.run(moveCamera)
                 }
             }
-            if (abs((ball.position.y - ballStartingPosition.y)) > 350) {
+            if (distanceBallTravelled > 350) {
                 movementWorthyEventHappened = true
             }
-            //            print(abs(ball.position.y - ballStartingPosition.y))
             lastTrackerPosition = trackerNode.position
-            if  (abs((ball.position.y - ballStartingPosition.y)) > 230) { // 230 --> ball has moved past half the screen
-                movementWorthyEventHappened = true // even if no collision detected, camera needs to move
-            }
-        }
+       }
         /* Store current update step time */
         lastTimeInterval = currentTime
-        
-        //        print("trackerNode X:\(trackerNode?.position.x) Y:\(trackerNode?.position.y))")
-        //        print("camera X:\(camera?.position.x) Y:\(camera?.position.y)")
     }
-    
 }
